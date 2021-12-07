@@ -269,7 +269,7 @@ for the possibility that some individuals may have specific genes that may
 have enhanced or hindered an effect.
 
 **Solution:** Best way to overcome this is by increasing the sample sizes
-to ensure that more genetic diversity and range  is accounted for. It will 
+to ensure that more genetic diversity and range is accounted for. It will 
 also be good to have a similar experiment but with genetically identical mice.
 
 Controlling for confounders - As additional information such as if participants’ 
