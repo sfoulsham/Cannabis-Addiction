@@ -279,7 +279,6 @@ This suggests that the two groups were effectively randomly allocated
 and were fair to test. 
 
 # Limitations
-
 People have different biologies and genetic makeup, using a historical 
 control would have given better understanding of what individual participants’ 
 reaction would have been to the placebo and to the drug. - It doesn’t account 
@@ -297,10 +296,10 @@ the person has used cannabis, long time users may be resistant to lower doses of
 (like long-time opioid users with decreasing sensitivity to opioids), making 
 nabiximol ineffective in satisfying withdrawal symptoms and cravings. 
 
+
 **Solution:** Collect associated information to control for confounders.
 
 # References 
-
 Weinstein, A. M., & Gorelick, D. A. (2011). Pharmacological Treatment of Cannabis 
 Dependence. Current Pharmaceutical Design, 17(14), 1351–1358. 
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3171994/
