@@ -46,7 +46,6 @@ a { /* Link colours */
 
 ```
 
-
 # Executive Summary
 
 # Data Setup
@@ -63,10 +62,8 @@ library(gapminder)
 library(plotly)
 ```
 
-
 # Initial Data Analysis 
 Great! Now let's begin our IDA where we'll explore the data, classify the variables, isolate a variable, and visualize the data. 
-
 
 ## Explore the Data
 Let's use `glimpse()`.
@@ -85,7 +82,6 @@ data$group = as.factor(data$group)
 class(data$group)
 ```
 
-
 ## Isolate a Variable
 Let's isolate cu_total and use `summary()` and `table()` to produce some basic numerical summaries.
 ```{r}
@@ -97,31 +93,25 @@ Here we can see that the minimum number of cannabis use instances was 0
 while the maximum was 28. We can also see through `table()` that there is 
 an association between the *weeks progressing* and *decreased cannabis use frequency*.
 
-
-
 ## Visualize the Data
-Let's create an initial visualisation of that association with `ggplot2`.
+Let's visualise that association.
 ```{r, message=FALSE}
-
-df <- data %>%
+df <- study_data %>%
   filter(group == "nabiximols" | group == "placebo") %>%
   select(group, week, cu_total)
 
-#To remove NA in cu_total
-
+# To remove NA in cu_total
 rf <- df %>%
   filter(cu_total != "NA") %>%
   select(group, week, cu_total)
 
-#To remove week00
-
+# To remove week00
 ff <- rf %>%
   filter(week != "week00") %>%
   select(group, week, cu_total)
 
-#Histogram Without Week 00 and NA Values
+# Histogram Without Week 00 and NA Values
 ggplot(ff, aes(x=cu_total)) + geom_histogram(aes(fill=week)) + facet_wrap(~ group) + ggtitle("Histogram Without Week 00 and NA Values")
-
 ```
 
 # Research Questions
@@ -130,31 +120,25 @@ ggplot(ff, aes(x=cu_total)) + geom_histogram(aes(fill=week)) + facet_wrap(~ grou
 > How does the relationship between the placebo and treatment group evolve throughout the 28 day study period?
 
 ```{r, results = 'hide', message=FALSE}
-#Creating different levels in the data for the group and week
-data %>%
-  mutate(id = factor(id),
-         group = factor(group,
-                        levels = c("placebo", 
-                                   "nabiximols")), 
-         week = factor(week,
-                       levels = c("week00",
-                                  "week04",
-                                  "week08",
-                                  "week12"))) 
-
-#Filtering out the NA values
-Data <- data %>%
+# Creating different levels in the data for the group and week
+study_data %>% mutate(id = factor(id),
+               group = factor(group,
+               levels = c("placebo", "nabiximols")), 
+               week = factor(week,
+               levels = c("week00", "week04", "week08", "week12"))) 
+                                  
+# Filtering out the NA values
+Data <- study_data %>%
   filter(cu_total != "NA") %>% 
   group_by(group, week)
 
 #Adding mean, sd, count and se for each group and week
 Level_summary <- Data %>%
   group_by(group, week) %>%
-  summarise(mean = mean(cu_total, 
-                        na.rm = T),
-            sd = sd(cu_total,
-                    na.rm = T),
-            count = n()) %>%
+  summarise(mean = mean(cu_total, na.rm = T),
+                   sd = sd(cu_total,
+                   na.rm = T),
+                   count = n()) %>%
   mutate(se = round(sd/sqrt(count),2)) %>%
   relocate(se, .before = "count") 
 
@@ -226,14 +210,14 @@ still needs to be determined.
   geom_point() +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "red") +
   ggtitle("Resid vs Fitted")
-  
 ```
 
 Therefore, this linear model is not appropriate for this data as a 
 spreading out trend occurs in the residual plot as the x-value increases.
 
 ## Number 3
-> Is the relationship between the number of days of cannabis use within the trial period for the nabiximpols and the placebo group for participants that completed the trial statistically significant?
+> Is the relationship between the number of days of cannabis use within the trial period 
+for the nabiximpols and the placebo group for participants that completed the trial statistically significant?
 
 ```{r}
 #Box Plot
@@ -266,7 +250,10 @@ drastic difference in medians and spreads.
 #Use a Mann-Whitney test since the data is not normally distributed
 wilcox.test(totalDaysUse ~ group, data = Completed)
 
-#Test whether the groups were effectively randomly allocated by statistically comparing the amount of days of cannabis use of the participants in the 28 days leading up to the trial
+#Test whether the groups were effectively randomly allocated by 
+statistically comparing the amount of days of cannabis use of the 
+participants in the 28 days leading up to the trial
+
 wilcox.test(week00 ~ group, data = Completed)
 ```
 
@@ -295,7 +282,6 @@ were not collected leaving room for confounders. Other confounders include how l
 the person has used cannabis, long time users may be resistant to lower doses of THC 
 (like long-time opioid users with decreasing sensitivity to opioids), making 
 nabiximol ineffective in satisfying withdrawal symptoms and cravings. 
-
 
 **Solution:** Collect associated information to control for confounders.
 
