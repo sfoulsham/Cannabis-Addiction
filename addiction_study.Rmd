@@ -1,3 +1,4 @@
+
 ---
 title: "DATA1901 Cannabis Use Disorder Project"
 author: "Thomas Love, Scarlett Foulsham, Lachy Miller, Liliann Lucas, and Nusrat Samiya"
@@ -43,7 +44,6 @@ a { /* Link colours */
 .tocify-header { /* fix for horrible indent in toc */
   text-indent: initial;
 }
-
 ```
 
 # Executive Summary
@@ -51,7 +51,7 @@ a { /* Link colours */
 # Data Setup
 Before we begin our data exploration, let's read in the data and load some important packages.
 
-Let's import the dataset which we've called `study_data`.
+Let's import the dataset which we've called `data`.
 ```{r}
 data = read.csv("study_data.csv")
 ```
@@ -63,15 +63,17 @@ library(plotly)
 ```
 
 # Initial Data Analysis 
-Great! Now let's begin our IDA where we'll explore the data, classify the variables, isolate a variable, and visualize the data. 
+Great! Now let's begin our IDA where we'll explore the data, classify the variables, 
+isolate a variable, and visualize the data. 
 
 ## Explore the Data
 Let's use `glimpse()`.
 ```{r}
 glimpse(data)
 ```
-We can see that the dataset has 398 rows and 4 columns which are id, group, week, and cu_total. 
-We can also see that `group` and `week` are classified as `chr`, let's make them both qualitative.
+We can see that the dataset has 398 rows and 4 columns which are id, group, 
+week, and cu_total. We can also see that `group` and `week` are classified as 
+`chr`, let's make them both qualitative.
 
 ## Classify the Variables
 Use the `as.factor()` function.
@@ -83,7 +85,8 @@ class(data$group)
 ```
 
 ## Isolate a Variable
-Let's isolate cu_total and use `summary()` and `table()` to produce some basic numerical summaries.
+Let's isolate cu_total and use `summary()` and `table()` to produce some
+basic numerical summaries.
 ```{r}
 data$cu_total
 summary(data$cu_total)
@@ -91,12 +94,13 @@ table(data$week)
 ```
 Here we can see that the minimum number of cannabis use instances was 0 
 while the maximum was 28. We can also see through `table()` that there is 
-an association between the *weeks progressing* and *decreased cannabis use frequency*.
+an association between the *weeks progressing* and *decreased cannabis use 
+frequency*.
 
 ## Visualize the Data
 Let's visualise that association.
 ```{r, message=FALSE}
-df <- study_data %>%
+df <- data %>%
   filter(group == "nabiximols" | group == "placebo") %>%
   select(group, week, cu_total)
 
@@ -110,8 +114,11 @@ ff <- rf %>%
   filter(week != "week00") %>%
   select(group, week, cu_total)
 
-# Histogram Without Week 00 and NA Values
-ggplot(ff, aes(x=cu_total)) + geom_histogram(aes(fill=week)) + facet_wrap(~ group) + ggtitle("Histogram Without Week 00 and NA Values")
+# Histogram without week00 and NA values
+ggplot(ff, aes(x=cu_total)) + 
+      geom_histogram(aes(fill=week)) + 
+      facet_wrap(~ group) + 
+      ggtitle("Histogram Without Week 00 and NA Values")
 ```
 
 # Research Questions
@@ -119,20 +126,20 @@ ggplot(ff, aes(x=cu_total)) + geom_histogram(aes(fill=week)) + facet_wrap(~ grou
 ## Number 1
 > How does the relationship between the placebo and treatment group evolve throughout the 28 day study period?
 
-```{r, results = 'hide', message=FALSE}
+```{r, results = "hide", message=FALSE}
 # Creating different levels in the data for the group and week
-study_data %>% mutate(id = factor(id),
-               group = factor(group,
-               levels = c("placebo", "nabiximols")), 
-               week = factor(week,
-               levels = c("week00", "week04", "week08", "week12"))) 
+data %>% mutate(id = factor(id),
+         group = factor(group,
+         levels = c("placebo", "nabiximols")), 
+         week = factor(week,
+         levels = c("week00", "week04", "week08", "week12"))) 
                                   
 # Filtering out the NA values
-Data <- study_data %>%
+Data <- data %>%
   filter(cu_total != "NA") %>% 
   group_by(group, week)
 
-#Adding mean, sd, count and se for each group and week
+# Adding mean, sd, count and se for each group and week
 Level_summary <- Data %>%
   group_by(group, week) %>%
   summarise(mean = mean(cu_total, na.rm = T),
@@ -142,19 +149,16 @@ Level_summary <- Data %>%
   mutate(se = round(sd/sqrt(count),2)) %>%
   relocate(se, .before = "count") 
 
-#Line graph of average cu_total by week for each group 
-  ggplot(Level_summary, mapping = aes(x = week,
-                       y = mean,
-                       group = group)) +
-  geom_point(mapping = aes(colour = group,
-                           shape = group)) +
-  geom_line(mapping = aes(colour = group)) +
-  coord_cartesian(ylim = c(0,28)) +
-  scale_y_continuous(breaks = seq(0,28,7)) +
-  theme_light() +
-  theme(legend.title = element_blank(),
-        panel.grid = element_blank()) +
-  labs(y = "days cannabis use in previous 28 days")
+# Line graph of average cu_total by week for each group 
+  ggplot(Level_summary, mapping = aes(x = week, y = mean, group = group)) +
+    geom_point(mapping = aes(colour = group, shape = group)) +
+    geom_line(mapping = aes(colour = group)) +
+    coord_cartesian(ylim = c(0,28)) +
+    scale_y_continuous(breaks = seq(0,28,7)) +
+    theme_light() +
+    theme(legend.title = element_blank(),
+    panel.grid = element_blank()) +
+    labs(y = "days cannabis use in previous 28 days")
 ```
 
 Therefore, each group has a differing trend through out the trial period,
@@ -167,46 +171,36 @@ still needs to be determined.
 
 ## Number 2
 > Is a linear model appropriate to analyse this data?
-
 ```{r, results='hide'}
-#Creating a wide table, separating the weeks.
-  WideView <- Data %>%
-    pivot_wider(names_from = week,
-                values_from = cu_total) 
+# Creating a wide table, separating the weeks.
+WideView <- Data %>%
+  pivot_wider(names_from = week, values_from = cu_total) 
   
-#Add total days use, total observable days and completed trial variables to the data.
-  WideView %<>%
-    rowwise() %>%
-    mutate(totalDaysUse = sum(c_across(week04:week12), 
-                              na.rm = T),
-           totalObsDays = (3 - sum(is.na(c_across(week04:week12)), 
-                                   na.rm = T))*28,
-           completedTrial = factor(ifelse(totalObsDays < 84,
-                                          "didNotComplete",
-                                          "completed"),
-                                   levels = c("didNotComplete",
-                                              "completed"))) %>% ungroup()
+# Add total days use, total observable days and completed trial variables to the data.
+WideView %<>%
+  rowwise() %>%
+  mutate(totalDaysUse = sum(c_across(week04:week12), na.rm = T),
+    totalObsDays = (3 - sum(is.na(c_across(week04:week12)), na.rm = T))*28,
+    completedTrial = factor(ifelse(totalObsDays < 84, "didNotComplete", "completed"),
+    levels = c("didNotComplete", "completed"))) %>% ungroup()
   
-  #separating only the participants that completed the trial.
-  Completed <- WideView %>%
-   filter(completedTrial == "completed")
+# Separating only the participants that completed the trial.
+Completed <- WideView %>%
+  filter(completedTrial == "completed")
  
-  #Now only 67 participants are analysed because the other 61 participants did not complete the trial.
-  Completed %>%
-    group_by(group) %>%
-    summarise(mean = mean(totalDaysUse, 
-                          na.rm = T),
-              sd = sd(totalDaysUse,
-                      na.rm = T), 
-              count = n())
+# Now only 67 participants are analysed because the other 61 participants did not complete the trial.
+Completed %>%
+  group_by(group) %>%
+  summarise(mean = mean(totalDaysUse, na.rm = T),
+  sd = sd(totalDaysUse, na.rm = T), 
+  count = n())
   
-  #Create a linear model
-    Linear1 <- lm(formula = totalDaysUse ~ group + week00,
-              data = Completed)
-  summary(Linear1)
+# Create a linear model
+Linear1 <- lm(formula = totalDaysUse ~ group + week00, data = Completed)
+summary(Linear1)
   
-  #Analyse regression graph of linear model
-  ggplot(Linear1, aes(x = .fitted, y = .resid)) +
+# Analyse regression graph of linear model
+ggplot(Linear1, aes(x = .fitted, y = .resid)) +
   geom_point() +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "red") +
   ggtitle("Resid vs Fitted")
@@ -220,12 +214,14 @@ spreading out trend occurs in the residual plot as the x-value increases.
 for the nabiximpols and the placebo group for participants that completed the trial statistically significant?
 
 ```{r}
-#Box Plot
-ggplot(Completed, aes(x=totalDaysUse)) + geom_histogram(colour = "red", fill = "orange", alpha = 0.3) + facet_wrap(~ group) +
+# Box Plot
+ggplot(Completed, aes(x=totalDaysUse)) + 
+  geom_histogram(colour = "red", fill = "orange", alpha = 0.3) +
+  facet_wrap(~ group) +
   theme_linedraw() +
   theme(legend.position = "none")
 
-#Bar Plot
+# Bar Plot
 ggplot(Completed, aes(x = group, y = totalDaysUse)) +
   geom_boxplot(color="red", fill="orange", alpha=0.3) +
   xlab("Group") +
@@ -233,7 +229,6 @@ ggplot(Completed, aes(x = group, y = totalDaysUse)) +
   ggtitle("Relationship between participants group and their total days of usage through out the trial") +
   theme_linedraw() +
   theme(legend.position = "none")
-
 ```
 
 As evident in the histogram, the total days use for participants 
@@ -247,10 +242,11 @@ also suggests that a significant difference exists, due to the
 drastic difference in medians and spreads.
 
 ```{r}
-#Use a Mann-Whitney test since the data is not normally distributed
+# Use a Mann-Whitney test since the data is not normally distributed
+
 wilcox.test(totalDaysUse ~ group, data = Completed)
 
-#Test whether the groups were effectively randomly allocated by 
+# Test whether the groups were effectively randomly allocated by 
 statistically comparing the amount of days of cannabis use of the 
 participants in the 28 days leading up to the trial
 
