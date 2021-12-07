@@ -1,6 +1,6 @@
 ---
 title: "DATA1901 Cannabis Use Disorder Project"
-author: 'Group 4: IDs are 500463233, 510431088, 510670104, 510519995, 510502872'
+author: "Thomas Love, Scarlett Foulsham, Lachy Miller, Liliann Lucas, and Nusrat Samiya"
 date: "University of Sydney | DATA1901 | September 2021"
 output:
   pdf_document:
@@ -54,7 +54,7 @@ Before we begin our data exploration, let's read in the data and load some impor
 
 Let's import the dataset which we've called `data`.
 ```{r}
-data = read.csv("cannabis_addiction.csv")
+data = read.csv("addiction_study.csv")
 ```
 Let's load `tidyverse`, `gapminder`, and `plotly`.
 ```{r, message=FALSE}
@@ -70,7 +70,8 @@ Let's use `glimpse()`.
 ```{r}
 glimpse(data)
 ```
-We can see that the dataset has 398 rows and 4 columns which are id, group, week, and cu_total. We can also see that while id and cu_total are numerical, R is unsure about how to classify `group` and `week` which it has assigned to `chr`. Let's make them both qualitative.
+We can see that the dataset has 398 rows and 4 columns which are id, group, week, and cu_total. 
+We can also see that `group` and `week` are classified as `chr`, let's make them both qualitative.
 
 ## Classify the Variables
 Use the `as.factor()` function.
